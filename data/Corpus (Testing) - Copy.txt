@@ -1,0 +1,60 @@
+﻿Question
+How can I redirect the user from one page to another using jQuery or pure JavaScript?
+Answer 1
+One does not simply redirect using jQuery
+jQuery is not necessary, and window.location.replace(...) will best simulate an HTTP redirect.
+window.location.replace(...) is better than using window.location.href, because replace() does not keep the originating page in the session history, meaning the user won't get stuck in a never-ending back-button fiasco.
+If you want to simulate someone clicking on a link, use  location.href
+If you want to simulate an HTTP redirect, use location.replace
+For example:
+// similar behavior as an HTTP redirect
+window.location.replace("http://stackoverflow.com");
+// similar behavior as clicking on a link
+window.location.href = "http://stackoverflow.com";
+First Way
+Here is the jQuery code for redirecting a page. Since, I have put this code on the $(document).ready() function, it will execute as soon as the page is loaded.
+var url = "http://stackoverflow.com";
+$(location).attr('href',url);
+You can even pass a URL directly to the attr() method, instead of using a variable.
+Second Way
+window.location.href="http://stackoverflow.com";
+You can also code like this (both are same internally):
+window.location="http://stackoverflow.com";
+If you are curious about the difference between window.location and window.location.href, then you can see that the latter one is setting href property explicitly, while the former one does it implicitly. Since window.location returns an object, which by default sets its .href property.
+Third Way
+There is another way to redirect a page using JavaScript, the replace() method of window.location object. You can pass a new URL to the replace() method, and it will simulate an HTTP redirect. By the way, remember that window.location.replace() method doesn't put the originating page in the session history, which may affect behavior of the back button. Sometime, it's what you want, so use it carefully.
+// Doesn't put originating page in history
+window.location.replace("http://stackoverflow.com");
+Fourth Way
+like attr() method (after jQuery 1.6 introduce)
+var url = "http://stackoverflow.com";
+$(location).prop('href', url);
+Answer 2
+Using JavaScript:
+Method 1:
+window.location.href="http://google.com";
+Method 2:
+window.location.replace("http://google.com");
+Using jQuery:
+Method 1: $(location)
+$(location).attr('href', 'http://google.com');
+Method 2: Reusable Function
+jQuery.fn.redirectTo = function(url){
+    window.location.href = url;
+}
+jQuery(window).redirectTo("http://google.com");
+Answer 3
+In my work experience, JavaScript is much better to redirect.
+It depends on how you want to change the location. If you want to log your website in users history, use window.location.href='ur website';. Otherwise to do it without logging in history, use window.location.replace("your website");.
+Answer 4
+This is how I use it.
+   window.location.replace('yourPage.aspx');   
+   // If you're on root and redirection page is also on the root
+   window.location.replace(window.location.host + '/subDirectory/yourPage.aspx');
+   // If you're in sub directory and redirection page is also in some other sub direct
+Answer 5
+If you want to redirect to a route within the same app simply
+window.location.pathname = '/examplepath'
+would be the way to go.
+[a]Test Suite should be on another document.
+[b]https://stackoverflow.com/questions/503093/how-do-i-redirect-to-another-webpage
