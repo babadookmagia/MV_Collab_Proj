@@ -1,3 +1,5 @@
+import javax.print.Doc;
+
 public class SemanticAnalysis {
     public static void main(String[] args) {
         Document corpus = Document.findDocument("C:\\Users\\kduval139\\IdeaProjects\\MV_Collab_Proj\\data\\Question 1.txt");
