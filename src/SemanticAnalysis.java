@@ -1,10 +1,11 @@
 public class SemanticAnalysis {
     public static void main(String[] args) {
-        Document corpus = Document.findDocument("C:\\Users\\kduval139\\IdeaProjects\\MV_Collab_Proj\\data\\Corpus (Testing) - Copy.txt");
+        Document corpus = Document.findDocument("C:\\Users\\kduval139\\IdeaProjects\\MV_Collab_Proj\\data\\Question 1.txt");
         String text = corpus.getText();
         String question = findquestion(text);
         String answerTxt = text.substring(text.indexOf("Answer") + 7);
         String[] answers = seperateAnswers(answerTxt);
+
     }
 
     private static String[] seperateAnswers(String answerTxt) {
