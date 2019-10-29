@@ -3,14 +3,15 @@ import java.util.ArrayList;
 
 public class SemanticAnalysis {
     public static void main(String[] args) {
-        Document corpus = Document.findDocument("C:\\Users\\ralran059\\IdeaProjects\\MV_Collab_Proj3\\data\\Question 1.txt");
-        ArrayList<String> getNegativeWords = getWordList("C:\\Users\\ralran059\\IdeaProjects\\MV_Collab_Proj3\\data\\particularPointerWords\\allSubtractiveWords.csv");
-        ArrayList<String> getPositiveWords = getWordList("C:\\Users\\ralran059\\IdeaProjects\\MV_Collab_Proj3\\data\\particularPointerWords\\allExperienceOrExamples.csv");
-        String text = corpus.getText();
-        String answerTxt = text.substring(text.indexOf("Answer") + 7);
-        String question = findQuestion(text);
-        String[] answers = seperateAnswers(answerTxt);
-        String[] ordered = reorderAnswers(question, answers); //ordered[0] is the most useful answer
+        for (int i = 1; i < 6; i++) {
+            String questionNum = "Question " + i;
+            Document corpus = Document.findDocument("C:\\Users\\kduval139\\IdeaProjects\\MV_Collab_Proj\\data\\" + questionNum + ".txt");
+            String text = corpus.getText();
+            String answerTxt = text.substring(text.indexOf("Answer") + 7).trim();
+            String question = findQuestion(text);
+            String[] answers = seperateAnswers(answerTxt);
+            String[] ordered = reorderAnswers(question, answers); //ordered[0] is the most useful answer
+        }
     }
 
     private static ArrayList<String> getWordList(String filename) {
@@ -27,15 +28,15 @@ public class SemanticAnalysis {
     private static int scoreAnswer(String answer, String question) {
         int score = 1000;
         //Find relavancy
-        score = score + findWords(answer,"C:\\Users\\kduval139\\IdeaProjects\\MV_Collab_Proj\\data\\particularPointerWords\\allExperienceOrExamples.csv");
-        score = score - findWords(answer,"C:\\Users\\ralran059\\IdeaProjects\\MV_Collab_Proj3\\data\\particularPointerWords\\allSubtractiveWords.csv");
+        score = score + findWords(answer, "C:\\Users\\kduval139\\IdeaProjects\\MV_Collab_Proj\\data\\particularPointerWords\\allExperienceOrExamples.csv");
+        score = score - findWords(answer, "C:\\Users\\kduval139\\IdeaProjects\\MV_Collab_Proj\\data\\particularPointerWords\\allSubtractiveWords.csv");
         if (score > 0) {
             return score;
         }
         return 0;
     }
 
-    private static int findWords(String answer,String filename) {
+    private static int findWords(String answer, String filename) {
         int score = 0;
         ArrayList<String> getNegativeWords = getWordList(filename);
         String answerLow = answer.toLowerCase();
