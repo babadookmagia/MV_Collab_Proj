@@ -3,24 +3,48 @@ import java.util.ArrayList;
 
 public class SemanticAnalysis {
     public static void main(String[] args) {
-        Document corpus = Document.findDocument("C:\\Users\\kduval139\\IdeaProjects\\MV_Collab_Proj\\data\\Question 1.txt");
-        ArrayList<String> negativeWords = (TextLib.sortDataPerValue("C:\\Users\\kduval139\\IdeaProjects\\MV_Collab_Proj\\data\\particularPointerWords\\allExperienceOrExamples.csv"));
-        System.out.println(negativeWords);
-        ArrayList<String> positiveWords = (TextLib.sortDataPerValue("C:\\Users\\kduval139\\IdeaProjects\\MV_Collab_Proj\\data\\particularPointerWords\\allSubtractiveWords.csv"));
-        System.out.println(positiveWords);
-
+        Document corpus = Document.findDocument("C:\\Users\\ralran059\\IdeaProjects\\MV_Collab_Proj3\\data\\Question 1.txt");
+        ArrayList<String> getNegativeWords = getWordList("C:\\Users\\ralran059\\IdeaProjects\\MV_Collab_Proj3\\data\\particularPointerWords\\allSubtractiveWords.csv");
+        ArrayList<String> getPositiveWords = getWordList("C:\\Users\\ralran059\\IdeaProjects\\MV_Collab_Proj3\\data\\particularPointerWords\\allExperienceOrExamples.csv");
         String text = corpus.getText();
         String answerTxt = text.substring(text.indexOf("Answer") + 7);
         String question = findQuestion(text);
-
-
         String[] answers = seperateAnswers(answerTxt);
         String[] ordered = reorderAnswers(question, answers); //ordered[0] is the most useful answer
-
     }
 
-    private static int scoreAnswer(String answer, String question){ //gives a professionalism score
-        return answer.length();
+    private static ArrayList<String> getWordList(String filename) {
+        ArrayList<String> wordsList = (TextLib.sortDataPerValue(TextLib.readFileAsString(filename)));
+        return wordsList;
+    }
+
+    private static void printArrayList(ArrayList<String> negativeWords) {
+        for (String negativeWord : negativeWords) {
+            System.out.println(negativeWord);
+        }
+    }
+
+    private static int scoreAnswer(String answer, String question) {
+        int score = 1000;
+        //Find relavancy
+        score = score + findWords(answer,"C:\\Users\\kduval139\\IdeaProjects\\MV_Collab_Proj\\data\\particularPointerWords\\allExperienceOrExamples.csv");
+        score = score - findWords(answer,"C:\\Users\\ralran059\\IdeaProjects\\MV_Collab_Proj3\\data\\particularPointerWords\\allSubtractiveWords.csv");
+        if (score > 0) {
+            return score;
+        }
+        return 0;
+    }
+
+    private static int findWords(String answer,String filename) {
+        int score = 0;
+        ArrayList<String> getNegativeWords = getWordList(filename);
+        String answerLow = answer.toLowerCase();
+        for (String word : getNegativeWords) {
+            if (answerLow.contains(word)) {
+                score++;
+            }
+        }
+        return score;
     }
 
     private static String[] reorderAnswers(String question, String[] answers) {
