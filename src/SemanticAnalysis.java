@@ -1,13 +1,19 @@
 import javax.print.Doc;
+import java.util.ArrayList;
 
 public class SemanticAnalysis {
     public static void main(String[] args) {
-        Document corpus = Document.findDocument("C:\\Users\\kduval139\\IdeaProjects\\MV_Collab_Proj\\data\\Question 1.txt");
+        Document corpus = Document.findDocument("IdeaProjects\\MV_Collab_Proj\\data\\forumQuestions\\Question 1.txt");
+        ArrayList<String> negativeWords = (TextLib.sortDataPerValue("IdeaProjects\\MV_Collab_Proj\\data\\particularPointerWords\\allSubtractiveWords.csv"));
+        System.out.println(negativeWords);
+        ArrayList<String> positiveWords = (TextLib.sortDataPerValue("IdeaProjects\\MV_Collab_Proj\\data\\particularPointerWords\\allExperienceOrExamples.csv"));
+        System.out.println(positiveWords);
         String text = corpus.getText();
         String answerTxt = text.substring(text.indexOf("Answer") + 7);
         String question = findQuestion(text);
         String[] answers = seperateAnswers(answerTxt);
         String[] ordered = reorderAnswers(question, answers); //ordered[0] is the most useful answer
+
     }
 
     private static int scoreAnswer(String answer, String question) {

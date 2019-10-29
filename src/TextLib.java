@@ -1,10 +1,9 @@
-import javafx.concurrent.Worker;
-
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.text.BreakIterator;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Locale;
 import java.util.Scanner;
 
@@ -46,6 +45,7 @@ public class TextLib {
             prevIndex = boundaryIndex;
             boundaryIndex = breakIterator.next();
         }
+
 
         String sentence = text.substring(prevIndex).trim();
         if (sentence.length()>0)
@@ -96,5 +96,13 @@ public class TextLib {
         return line.substring(0, line.indexOf("="));
     }
 
+    public static ArrayList<String> sortDataPerValue(String text) {
+        return parseDataIntoArrayList(text, "\n");
+    }
 
+
+    private static ArrayList<String> parseDataIntoArrayList(String text, String splitter) {
+        ArrayList<String> seperatedLines = new ArrayList<>(Arrays.asList(text.split(splitter)));
+        return seperatedLines;
+    }
 }
