@@ -3,30 +3,23 @@ import java.util.ArrayList;
 
 public class SemanticAnalysis {
     public static void main(String[] args) {
-        Document corpus = Document.findDocument("C:\\Users\\ralran059\\IdeaProjects\\MV_Collab_Proj3\\data\\Question 1.txt");
-        ArrayList<String> getNegativeWords =getWordList("C:\\Users\\ralran059\\IdeaProjects\\MV_Collab_Proj3\\data\\particularPointerWords\\allSubtractiveWords.csv");
-        ArrayList<String> getPositiveWords = getWordList("C:\\Users\\ralran059\\IdeaProjects\\MV_Collab_Proj3\\data\\particularPointerWords\\allExperienceOrExamples.csv");
+        Document corpus = Document.findDocument("C:\\Users\\kduval139\\IdeaProjects\\MV_Collab_Proj\\data\\Question 1.txt");
+        ArrayList<String> negativeWords = (TextLib.sortDataPerValue("C:\\Users\\kduval139\\IdeaProjects\\MV_Collab_Proj\\data\\particularPointerWords\\allExperienceOrExamples.csv"));
+        System.out.println(negativeWords);
+        ArrayList<String> positiveWords = (TextLib.sortDataPerValue("C:\\Users\\kduval139\\IdeaProjects\\MV_Collab_Proj\\data\\particularPointerWords\\allSubtractiveWords.csv"));
+        System.out.println(positiveWords);
+
         String text = corpus.getText();
         String answerTxt = text.substring(text.indexOf("Answer") + 7);
         String question = findQuestion(text);
+
+
         String[] answers = seperateAnswers(answerTxt);
         String[] ordered = reorderAnswers(question, answers); //ordered[0] is the most useful answer
+
     }
 
-    private static ArrayList<String> getWordList(String filename) {
-        ArrayList<String> wordsList = (TextLib.sortDataPerValue(TextLib.readFileAsString(filename)));
-        return wordsList;
-    }
-
-    private static void printArrayList(ArrayList<String> negativeWords) {
-        for (String negativeWord : negativeWords) {
-            System.out.println(negativeWord);
-        }
-    }
-
-    private static int scoreAnswer(String answer, String question) {
-        int score = answer.length();
-
+    private static int scoreAnswer(String answer, String question){ //gives a professionalism score
         return answer.length();
     }
 
