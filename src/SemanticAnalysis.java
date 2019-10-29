@@ -3,11 +3,11 @@ import java.util.ArrayList;
 
 public class SemanticAnalysis {
     public static void main(String[] args) {
-        Document corpus = Document.findDocument("IdeaProjects\\MV_Collab_Proj\\data\\forumQuestions\\Question 1.txt");
-        ArrayList<String> negativeWords = (TextLib.sortDataPerValue("IdeaProjects\\MV_Collab_Proj\\data\\particularPointerWords\\allSubtractiveWords.csv"));
-        System.out.println(negativeWords);
-        ArrayList<String> positiveWords = (TextLib.sortDataPerValue("IdeaProjects\\MV_Collab_Proj\\data\\particularPointerWords\\allExperienceOrExamples.csv"));
-        System.out.println(positiveWords);
+        Document corpus = Document.findDocument("C:\\Users\\ralran059\\IdeaProjects\\MV_Collab_Proj3\\data\\Question 1.txt");
+        ArrayList<String> negativeWords = (TextLib.sortDataPerValue(TextLib.readFileAsString("C:\\Users\\ralran059\\IdeaProjects\\MV_Collab_Proj3\\data\\particularPointerWords\\allSubtractiveWords.csv")));
+        printArrayList(negativeWords);
+        ArrayList<String> positiveWords = (TextLib.sortDataPerValue(TextLib.readFileAsString("C:\\Users\\ralran059\\IdeaProjects\\MV_Collab_Proj3\\data\\particularPointerWords\\allExperienceOrExamples.csv")));
+        printArrayList(positiveWords);
         String text = corpus.getText();
         String answerTxt = text.substring(text.indexOf("Answer") + 7);
         String question = findQuestion(text);
@@ -16,7 +16,15 @@ public class SemanticAnalysis {
 
     }
 
+    private static void printArrayList(ArrayList<String> negativeWords) {
+        for (String negativeWord : negativeWords) {
+            System.out.println(negativeWord);
+        }
+    }
+
     private static int scoreAnswer(String answer, String question) {
+        int score = answer.length();
+
         return answer.length();
     }
 
