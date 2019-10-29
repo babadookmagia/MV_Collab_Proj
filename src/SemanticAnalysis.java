@@ -7,7 +7,7 @@ public class SemanticAnalysis {
             String questionNum = "Question " + i;
             Document corpus = Document.findDocument("C:\\Users\\kduval139\\IdeaProjects\\MV_Collab_Proj\\data\\" + questionNum + ".txt");
             String text = corpus.getText();
-            String answerTxt = text.substring(text.indexOf("Answer") + 7).trim();
+            String answerTxt = text.substring(text.indexOf("Answer") + "answer".length()).trim();
             String question = findQuestion(text);
             String[] answers = seperateAnswers(answerTxt);
             String[] ordered = reorderAnswers(question, answers); //ordered[0] is the most useful answer
@@ -27,7 +27,8 @@ public class SemanticAnalysis {
 
     private static int scoreAnswer(String answer, String question) {
         int score = 1000;
-        //Find relavancy
+        //Find and compare relevancy
+        //Find and Compare Size
         score = score + findWords(answer, "C:\\Users\\kduval139\\IdeaProjects\\MV_Collab_Proj\\data\\particularPointerWords\\allExperienceOrExamples.csv");
         score = score - findWords(answer, "C:\\Users\\kduval139\\IdeaProjects\\MV_Collab_Proj\\data\\particularPointerWords\\allSubtractiveWords.csv");
         if (score > 0) {
