@@ -1,3 +1,5 @@
+import javax.print.Doc;
+import javax.print.attribute.standard.DocumentName;
 import java.util.ArrayList;
 
 public class answer {
@@ -16,7 +18,7 @@ public class answer {
     }
 
     public void breakUpAnswerIntoWords(){
-       individualWords = TextLib.parseDataIntoArrayList(completeAnswer, " ");
+       individualWords = Document.stringToWords(completeAnswer);
     }
 
     public ArrayList<String> getIndividualWordsList() {
@@ -31,5 +33,11 @@ public class answer {
         return score;
     }
 
+    public void setScore(int score) {
+        this.score = score;
+    }
 
+    public void setCompleteAnswer(String completeAnswer) {
+        this.completeAnswer = completeAnswer;
+    }
 }
