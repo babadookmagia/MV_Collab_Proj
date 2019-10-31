@@ -3,28 +3,27 @@ import java.util.ArrayList;
 public class SemanticAnalysis {
 
 
-    final static String positiveWordsfile = "C:\\Users\\kduval139\\IdeaProjects\\MV_Collab_Proj\\data\\particularPointerWords\\allExperienceOrExamples.csv";
-    final static String negativeWordFile = "C:\\Users\\kduval139\\IdeaProjects\\MV_Collab_Proj\\data\\particularPointerWords\\allSubtractiveWords.csv";
-    final static String stopWords = "C:\\Users\\sharoni\\IdeaProjects\\MV_Collab_Proj1\\data\\particularPointerWords\\stop-words.txt";
+    final static String positiveWordsfile = "data\\particularPointerWords\\allExperienceOrExamples.csv";
+    final static String negativeWordFile = "data\\particularPointerWords\\allSubtractiveWords.csv";
+    final static String stopWords = "data\\particularPointerWords\\stop-words.txt";
 
-   final static ArrayList<String> listOfNegativeConnotingWords = getWordList(negativeWordFile);
-   final static ArrayList<String> listOfPositiveConnotingWords = getWordList(positiveWordsfile);
-   final static ArrayList<String> listOfStopWords = getWordList(stopWords);
-   final static double multiplierForMinLength = 0.0; //change later
+    final static ArrayList<String> listOfNegativeConnotingWords = getWordList(negativeWordFile);
+    final static ArrayList<String> listOfPositiveConnotingWords = getWordList(positiveWordsfile);
+    final static ArrayList<String> listOfStopWords = getWordList(stopWords);
+    final static double multiplierForMinLength = 0.0; //change later
     final static double multiplierForMaxLength = 0.0; //change later
-
-
 
 
     public static void main(String[] args) {
         for (int i = 1; i < 6; i++) {
             String questionNum = "Question " + i;
-            Document corpus = Document.findDocument("C:\\Users\\kduval139\\IdeaProjects\\MV_Collab_Proj\\data\\" + questionNum + ".txt");
+            Document corpus = Document.findDocument("data\\" + questionNum + ".txt");
             String text = corpus.getText();
             String answerTxt = text.substring(text.indexOf("Answer") + "Answers".length()).trim();
             String question = findQuestion(text);
             Answers[] answers = setIndividualAnswerText(i, answerTxt);
             answers = reorderAnswers(question, answers); //ordered[0] is the most useful Answers
+            System.out.println(answers[0].getCompleteAnswer());
         }
     }
 
@@ -50,12 +49,12 @@ public class SemanticAnalysis {
 
 
     private static void scoreAnswer(Answers[] answer, String question) { //(unfinished) important for roy to finish reasonable scoring by assigning a score to each Answer object
-         int meanOfAnswers = findMeanLengthOfAnswer(answer);
+        int meanOfAnswers = findMeanLengthOfAnswer(answer);
         for (int answerNum = 0; answerNum < answer.length; answerNum++) {
             scoringAccordingToLength(answer[answerNum], meanOfAnswers);
-            compareAnswersToQuestion(answer,answerNum, question);
-            findWords(answer ,listOfNegativeConnotingWords , answerNum);
-            findWords(answer ,listOfPositiveConnotingWords, answerNum);
+            compareAnswersToQuestion(answer, answerNum, question);
+            findWords(answer, listOfNegativeConnotingWords, answerNum);
+            findWords(answer, listOfPositiveConnotingWords, answerNum);
         }
 
     } //keep in mind it is void so just set each thing in the answer list
@@ -65,15 +64,15 @@ public class SemanticAnalysis {
         for (Answers answers : answer) {
             totalSumLength += answers.getIndividualWords().size();
         }
-        return totalSumLength/answer.length;
+        return totalSumLength / answer.length;
     }
 
     private static void scoringAccordingToLength(Answers answer, int meanOfAnswers) {//different if statments if you want to change how each size impacts score
 
-        if (answer.getIndividualWords().size() < meanOfAnswers  * multiplierForMinLength  )
-        answer.addToAnswerScore(-1); //can Change Later
+        if (answer.getIndividualWords().size() < meanOfAnswers * multiplierForMinLength)
+            answer.addToAnswerScore(-1); //can Change Later
 
-        if (answer.getIndividualWords().size() > meanOfAnswers  * multiplierForMaxLength )
+        if (answer.getIndividualWords().size() > meanOfAnswers * multiplierForMaxLength)
             answer.addToAnswerScore(-2); //can Change Later
 
 
@@ -86,19 +85,19 @@ public class SemanticAnalysis {
     }
 
     private static void checkForSharedWordsBetweenAnswerAndQuestion(Answers answer, ArrayList<String> individualQuestionWords) {
-            for (String individualQuestionWord : individualQuestionWords) {
-                if (answer.equals(individualQuestionWord))
-                    answer.addToAnswerScore(1);  //can change number later (Is this a problem because maybe it doesnt change value of ansewr in array)
-            }
+        for (String individualQuestionWord : individualQuestionWords) {
+            if (answer.getCompleteAnswer().contains(individualQuestionWord))
+                answer.addToAnswerScore(10);  //can change number later (Is this a problem because maybe it doesnt change value of ansewr in array)
         }
+    }
 
 
     private static ArrayList<String> removeStopWords(ArrayList<String> individualWords) {
-        for (int i = 0; i < individualWords.size() ; i++) {
-            if (listOfStopWords.contains(individualWords.get(i))){
+        for (int i = 0; i < individualWords.size(); i++) {
+            if (listOfStopWords.contains(individualWords.get(i))) {
                 individualWords.remove(i);
-            i--;
-        }
+                i--;
+            }
         }
         return individualWords;
     }
@@ -113,7 +112,7 @@ public class SemanticAnalysis {
     }
 
     private static Answers[] reorderAnswers(String question, Answers[] answers) { //gets scores and reorders the Answers
-        scoreAnswer(answers,question);
+        scoreAnswer(answers, question);
         return reorderBasedonScore(answers);
     }
 
