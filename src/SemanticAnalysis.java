@@ -16,6 +16,7 @@ public class SemanticAnalysis {
 
     private static int multiplierForMinLength = 0;
     private static int multiplierForMaxLength = 0;
+    private static int multiplierForReadabilityScore = 0;
 
     private static int underMinWordPenaltyScore = 0;
     private static int overMaxWordPenaltyScore = 0;
@@ -33,7 +34,7 @@ public class SemanticAnalysis {
     public static void main(String[] args) {
         Scanner keyboard = new Scanner(System.in);
 
-        promptUserInput(keyboard);
+      //  promptUserInput(keyboard);
 
         for (int i = 1; i < 6; i++) {
             String questionNum = "Question " + i;
@@ -47,28 +48,33 @@ public class SemanticAnalysis {
     }
 
     private static void promptUserInput(Scanner keyboard) {
-        System.out.println("In order to deduct points for a length that surpasses the maximum length, a maximum length must be determined. How much would you like to multiply the average length of the answers by to make the generate the wanted maximum.");
-        multiplierForMaxLength = keyboard.nextInt();
+        do {
+            System.out.println("All of the following values must be positive. If one value does not follow this criteria you will have to endure this long procedure again.");
 
-        System.out.println("In order to deduct points for a length that surpasses the minimum length, a minimum length must be determined. How much would you like to multiply the average length of the answers by to generate the wanted minimum.");
-        multiplierForMinLength = keyboard.nextInt();
+            System.out.println("In order to deduct points for a length that surpasses the maximum length, a maximum length must be determined. How much would you like to multiply the average length of the answers by to make the generate the wanted maximum.");
+            multiplierForMaxLength = keyboard.nextInt();
 
-        System.out.println("How many points would you like to deduct if the answer length surpasses the maximum previously created?");
-        overMaxWordPenaltyScore = keyboard.nextInt();
+            System.out.println("In order to deduct points for a length that surpasses the minimum length, a minimum length must be determined. How much would you like to multiply the average length of the answers by to generate the wanted minimum.");
+            multiplierForMinLength = keyboard.nextInt();
 
-        System.out.println("How many points would you like to deduct if the answer length does not meet the minimum previously created?(input still positive)");
-        underMinWordPenaltyScore = keyboard.nextInt();
+            System.out.println("How many points would you like to deduct if the answer length surpasses the maximum previously created?");
+            overMaxWordPenaltyScore = keyboard.nextInt();
 
-        System.out.println("How many points would you like to add if the answer contains a word that is contained in the question. (this shows if question is relevant)");
-        scoreAdditionIfResemblesQuestion = keyboard.nextInt();
+            System.out.println("How many points would you like to deduct if the answer length does not meet the minimum previously created?(input still positive)");
+            underMinWordPenaltyScore = keyboard.nextInt();
 
-        System.out.println("How many points would you like to add if the answer incorporates an experience connoting phrase?");
-        scoreAdditionForInclusionOfpositiveWords = keyboard.nextInt();
+            System.out.println("How many points would you like to add if the answer contains a word that is contained in the question. (this shows if question is relevant)");
+            scoreAdditionIfResemblesQuestion = keyboard.nextInt();
 
-        System.out.println("How many points would you like to deduct if the answer incorporates a swear word or unprofessional language?");
-        scorePenaltyForInclusionOfNegativeWords = keyboard.nextInt();
+            System.out.println("How many points would you like to add if the answer incorporates an experience connoting phrase?");
+            scoreAdditionForInclusionOfpositiveWords = keyboard.nextInt();
 
+            System.out.println("How many points would you like to deduct if the answer incorporates a swear word or unprofessional language?");
+            scorePenaltyForInclusionOfNegativeWords = keyboard.nextInt();
 
+            System.out.println("In order to add points for according to the complexity of the answer a multiplier must be determined to control the impact of this criteria on the overall score. How much would you like to multiply the readability of the answer by to determine the impact?");
+            multiplierForMaxLength = keyboard.nextInt();
+        }while (multiplierForMaxLength <= 0 || multiplierForMinLength <= 0 ||overMaxWordPenaltyScore <= 0 ||underMinWordPenaltyScore <= 0 ||scoreAdditionIfResemblesQuestion <= 0 ||scoreAdditionForInclusionOfpositiveWords <= 0 || scorePenaltyForInclusionOfNegativeWords <= 0 );
     }
 
     private static Answers[] setIndividualAnswerText(int questionNum, String fullAnswerString) {
@@ -106,9 +112,8 @@ public class SemanticAnalysis {
 
     private static void fkReadability(Answers answers) {
         Document fk = new Document(answers.getCompleteAnswer());
-        answers.addToAnswerScore((int)fk.getFleschKincaidScore());
+        answers.addToAnswerScore((int)fk.getFleschKincaidScore()*multiplierForReadabilityScore);
     }
-
 
     private static void findConnotationOfWords(Answers[] answer, ArrayList<String> listOfConnotingWords, int answerNum) {
         String answerLow = answer[answerNum].getCompleteAnswer().toLowerCase();
