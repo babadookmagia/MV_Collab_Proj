@@ -37,7 +37,7 @@ public class SemanticAnalysis {
 
         for (int i = 1; i < 6; i++) {
             String questionNum = "Question " + i;
-            Document corpus = Document.findDocument("data\\" + questionNum + ".txt");
+            Document corpus = Document.findDocument("data\\forumQuestions\\" + questionNum + ".txt");
             String text = corpus.getText();
             String answerTxt = text.substring(text.indexOf("Answer") + "Answers".length()).trim();
             String question = findQuestion(text);
