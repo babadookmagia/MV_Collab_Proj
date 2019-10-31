@@ -23,7 +23,6 @@ public class SemanticAnalysis {
             String question = findQuestion(text);
             Answers[] answers = setIndividualAnswerText(i, answerTxt);
             answers = reorderAnswers(question, answers); //ordered[0] is the most useful Answers
-            System.out.println(answers[0].getCompleteAnswer());
         }
     }
 
@@ -121,7 +120,8 @@ public class SemanticAnalysis {
 
         for (int i = 0; i < answers.length; i++) {
             int maxIndex = findmaxindex(answers);
-            reorder[i] = answers[maxIndex];
+            Answers max = answers[maxIndex];
+            reorder[i] = max;
             answers[maxIndex].setScore(0);
         }
         return reorder;
