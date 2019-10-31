@@ -8,31 +8,32 @@ public class SemanticAnalysis {
             String text = corpus.getText();
             String answerTxt = text.substring(text.indexOf("Answer") + "Answers".length()).trim();
             String question = findQuestion(text);
-            Answers[] answers = new Answers[seperateAnswers(answerTxt).length];
-            setIndividualAnswerText(answers, i, answerTxt);
-            String[] ordered = reorderAnswers(question, answers); //ordered[0] is the most useful Answers
+            Answers[] answers = setIndividualAnswerText(i, answerTxt);
+            reorderAnswers(question, answers); //ordered[0] is the most useful Answers
         }
     }
 
-    private static void setIndividualAnswerText(Answers[] answers, int questionNum, String fullAnswerString) {
+    private static Answers[] setIndividualAnswerText(int questionNum, String fullAnswerString) {
+        String[] textData = seperateAnswers(fullAnswerString);
+        Answers[] answers = new Answers[textData.length];
         for (int i = 0; i < answers.length; i++) {
-            Answers answer = new Answers(seperateAnswers(fullAnswerString)[i]);
-            answer.setQuestionNum(questionNum);
-            answers[i]= answer;
+            Answers single = new Answers(textData[i], questionNum);
+            answers[i] = single;
         }
-    }
-    private static ArrayList<String> getWordList(String filename) {
-        ArrayList<String> wordsList = (TextLib.sortDataPerValue(TextLib.readFileAsString(filename)));
-        return wordsList;
-    }
+        return answers;
+    } //gives each answer object correct text and question number
 
-    private static void printArrayList(ArrayList<String> negativeWords) {
+    private static ArrayList<String> getWordList(String filename) {
+        return (TextLib.sortDataPerValue(TextLib.readFileAsString(filename)));
+    } //uses TextLib class to parse (filename.csv) into an arraylist of words
+
+    private static void printArrayList(ArrayList<String> negativeWords) { //tester method to print array list (delete?)
         for (String negativeWord : negativeWords) {
             System.out.println(negativeWord);
         }
     }
 
-    private static int scoreAnswer(String[] answer, String question) {
+    private static void scoreAnswer(Answers[] answer, String question) { //(unfinished) important for roy to finish reasonable scoring by assigning a score to each Answer object
         int score = 1000;
         //Find and compare relevancy
         //Find and Compare Size
@@ -45,7 +46,7 @@ public class SemanticAnalysis {
         return 0;
     }
 
-    private static int findWords(String answer, String filename) {
+    private static int findWords(String answer, String filename) { //Seaches for certain amounts of a word in an answer from corpus (filename)
         int score = 0;
         ArrayList<String> getNegativeWords = getWordList(filename);
         String answerLow = answer.toLowerCase();
@@ -57,44 +58,39 @@ public class SemanticAnalysis {
         return score;
     }
 
-    private static String[] reorderAnswers(String question, Answers[] answers) {
-        String[] reorder = new String[answers.length];
-        findAllScores(answers, question);
-        reorderBasedonScore(reorder, answers);
+    private static Answers[] reorderAnswers(String question, Answers[] answers) { //gets scores and reorders the Answers
+        scoreAnswer(answers[],question);
+        return reorderBasedonScore(answers);
+    }
+
+    private static Answers[] reorderBasedonScore(Answers[] answers) { //makes a new array that reorders the answers based on score
+        Answers[] reorder = new Answers[answers.length];
+
+        for (int i = 0; i < answers.length; i++) {
+            int maxIndex = findmaxindex(answers);
+            reorder[i] = answers[maxIndex];
+            answers[maxIndex].setScore(0);
+        }
         return reorder;
     }
 
-    private static void reorderBasedonScore(String[] reorder, int[] pScores, String[] answers) {
-        for (int i = 0; i < answers.length; i++) {
-            int maxIndex = findmaxindex(pScores);
-            reorder[i] = answers[maxIndex];
-            pScores[maxIndex] = 0;
-        }
-    }
-
-    private static int findmaxindex(int[] pScores) {
-        int max = pScores[0];
+    private static int findmaxindex(Answers[] answers) { //will find the index of the answer with the highest score
+        int max = answers[0].getScore();
         int maxIndex = 0;
-        for (int i = 1; i < pScores.length; i++) {
-            if (pScores[i] > max) {
-                max = pScores[i];
+        for (int i = 1; i < answers.length; i++) {
+            if (answers[i].getScore() > max) {
+                max = answers[i].getScore();
                 maxIndex = i;
             }
         }
         return maxIndex;
     }
 
-    private static void findAllScores(String[] answers, String question) {
-        for (int i = 0; i < answers.length; i++) {
-            pScores[i] = scoreAnswer(answers, question);
-        }
-    }
-
-    private static String[] seperateAnswers(String answerTxt) {
+    private static String[] seperateAnswers(String answerTxt) { //splits answer text into a array of strings
         return answerTxt.split("Answer");
     }
 
-    private static String findQuestion(String text) {
+    private static String findQuestion(String text) { //Just looks for the question with substring
         int startindex = text.indexOf("Question") + 8;
         int endindex = text.indexOf("Answer");
         return text.substring(startindex, endindex);

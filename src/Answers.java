@@ -4,12 +4,12 @@ import java.util.ArrayList;
 
 public class Answers {
 
-    String completeAnswer;
-    ArrayList<String> individualWords;
-    int score;
-    int questionNum;
+    private String completeAnswer;
+    private ArrayList<String> individualWords;
+    private int score;
+    private int questionNum;
 
-    public Answers(String completeAnswer){
+    public Answers(String completeAnswer,int questionNum){
         this.completeAnswer = completeAnswer;
         breakUpAnswerIntoWords();
         this.score = 1000;
