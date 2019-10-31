@@ -50,4 +50,12 @@ public class Answers {
     public int getQuestionNum() {
         return questionNum;
     }
+
+    public ArrayList<String> getIndividualWords() {
+        return individualWords;
+    }
+
+    public void setIndividualWords(ArrayList<String> individualWords) {
+        this.individualWords = individualWords;
+    }
 }

@@ -115,4 +115,8 @@ public class TextLib {
             }
         }
     }
+
+    public static ArrayList<Answers> answerArrayToArrayList(Answers[] answers){
+        return new ArrayList<>(Arrays.asList(answers));
+    }
 }
