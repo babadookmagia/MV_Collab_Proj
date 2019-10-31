@@ -4,23 +4,25 @@ import java.util.Scanner;
 public class SemanticAnalysis {
 
 
-    final static String positiveWordsfile = "data\\particularPointerWords\\allExperienceOrExamples.csv";
-    final static String negativeWordFile = "data\\particularPointerWords\\allSubtractiveWords.csv";
-    final static String stopWords = "data\\particularPointerWords\\stop-words.txt";
+    private final static String positiveWordsfile = "data\\particularPointerWords\\allExperienceOrExamples.csv";
+    private final static String negativeWordFile = "data\\particularPointerWords\\allSubtractiveWords.csv";
+    private final static String stopWords = "data\\particularPointerWords\\stop-words.txt";
 
-    final static ArrayList<String> listOfNegativeConnotingWords = getWordList(negativeWordFile);
-    final static ArrayList<String> listOfPositiveConnotingWords = getWordList(positiveWordsfile);
-    final static ArrayList<String> listOfStopWords = getWordList(stopWords);
+    private final static ArrayList<String> listOfNegativeConnotingWords = getWordList(negativeWordFile);
+    private final static ArrayList<String> listOfPositiveConnotingWords = getWordList(positiveWordsfile);
+    private final static ArrayList<String> listOfStopWords = getWordList(stopWords);
 
 
-    final static int multiplierForMinLength = 0;
-    final static int multiplierForMaxLength = 0;
+    private static int multiplierForMinLength = 0;
+    private static int multiplierForMaxLength = 0;
 
-    final static int underMinWordPenaltyScore = 0;
-    final static int overMaxWordPenaltyScore = 0;
+    private static int underMinWordPenaltyScore = 0;
+    private static int overMaxWordPenaltyScore = 0;
 
-    final static int scoreAdditionIfResemblesQuestion = 0;
-    final static int djs = 0;
+    private static int scoreAdditionIfResemblesQuestion = 0;
+
+    private static int scorePenaltyForInclusionOfNegativeWords = 0;
+    private static int scoreAdditionForInclusionOfpositiveWords = 0;
 
 
 
@@ -30,7 +32,7 @@ public class SemanticAnalysis {
     public static void main(String[] args) {
         Scanner keyboard = new Scanner(System.in);
 
-
+        promptUserInput(keyboard);
 
         for (int i = 1; i < 6; i++) {
             String questionNum = "Question " + i;
@@ -41,6 +43,31 @@ public class SemanticAnalysis {
             Answers[] answers = setIndividualAnswerText(i, answerTxt);
             answers = reorderAnswers(question, answers); //ordered[0] is the most useful Answers
         }
+    }
+
+    private static void promptUserInput(Scanner keyboard) {
+        System.out.println("In order to deduct points for a length that surpasses the maximum length, a maximum length must be determined. How much would you like to multiply the average length of the answers by to make the generate the wanted maximum.");
+        multiplierForMaxLength = keyboard.nextInt();
+
+        System.out.println("In order to deduct points for a length that surpasses the minimum length, a minimum length must be determined. How much would you like to multiply the average length of the answers by to generate the wanted minimum.");
+        multiplierForMinLength = keyboard.nextInt();
+
+        System.out.println("How many points would you like to deduct if the answer length surpasses the maximum previously created?");
+        overMaxWordPenaltyScore = keyboard.nextInt();
+
+        System.out.println("How many points would you like to deduct if the answer length does not meet the minimum previously created?(input still positive)");
+        underMinWordPenaltyScore = keyboard.nextInt();
+
+        System.out.println("How many points would you like to add if the answer contains a word that is contained in the question. (this shows if question is relevant)");
+        scoreAdditionIfResemblesQuestion = keyboard.nextInt();
+
+        System.out.println("How many points would you like to add if the answer incorporates an experience connoting phrase?");
+        scoreAdditionForInclusionOfpositiveWords = keyboard.nextInt();
+
+        System.out.println("How many points would you like to deduct if the answer incorporates a swear word or unprofessional language?");
+        scorePenaltyForInclusionOfNegativeWords = keyboard.nextInt();
+
+
     }
 
     private static Answers[] setIndividualAnswerText(int questionNum, String fullAnswerString) {
@@ -69,11 +96,23 @@ public class SemanticAnalysis {
         for (int answerNum = 0; answerNum < answer.length; answerNum++) {
             scoringAccordingToLength(answer[answerNum], meanOfAnswers);
             compareAnswersToQuestion(answer, answerNum, question);
-            findWords(answer, listOfNegativeConnotingWords, answerNum);
-            findWords(answer, listOfPositiveConnotingWords, answerNum);
+            findConnotationOfWords(answer, listOfNegativeConnotingWords, answerNum);
+            findConnotationOfWords(answer, listOfPositiveConnotingWords, answerNum);
         }
 
     } //keep in mind it is void so just set each thing in the answer list
+
+    private static void findConnotationOfWords(Answers[] answer, ArrayList<String> listOfConnotingWords, int answerNum) {
+        String answerLow = answer[answerNum].getCompleteAnswer().toLowerCase();
+        for (String word : listOfPositiveConnotingWords) {
+            if (answerLow.contains(word)) {
+                if (listOfNegativeConnotingWords.contains(listOfConnotingWords))
+                    answer[answerNum].addToAnswerScore(-scorePenaltyForInclusionOfNegativeWords);
+                else
+                answer[answerNum].addToAnswerScore(scoreAdditionForInclusionOfpositiveWords);
+            }
+        }
+    }
 
     private static int findMeanLengthOfAnswer(Answers[] answer) {
         int totalSumLength = 0;
@@ -116,15 +155,6 @@ public class SemanticAnalysis {
             }
         }
         return individualWords;
-    }
-
-    private static void findWords(Answers[] answer, ArrayList<String> listOfconnotingWords, int answerNum) { //Seaches for certain amounts of a word in an answer from corpus (filename)
-        String answerLow = answer[answerNum].getCompleteAnswer().toLowerCase();
-        for (String word : listOfconnotingWords) {
-            if (answerLow.contains(word)) {
-                answer[answerNum].addToAnswerScore(1);
-            }
-        }
     }
 
     private static Answers[] reorderAnswers(String question, Answers[] answers) { //gets scores and reorders the Answers
