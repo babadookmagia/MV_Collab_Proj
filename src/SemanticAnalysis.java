@@ -1,3 +1,4 @@
+import javax.print.Doc;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -96,11 +97,18 @@ public class SemanticAnalysis {
         for (int answerNum = 0; answerNum < answer.length; answerNum++) {
             scoringAccordingToLength(answer[answerNum], meanOfAnswers);
             compareAnswersToQuestion(answer, answerNum, question);
+            fkReadability(answer[answerNum]);
             findConnotationOfWords(answer, listOfNegativeConnotingWords, answerNum);
             findConnotationOfWords(answer, listOfPositiveConnotingWords, answerNum);
         }
 
     } //keep in mind it is void so just set each thing in the answer list
+
+    private static void fkReadability(Answers answers) {
+        Document fk = new Document(answers.getCompleteAnswer());
+        answers.addToAnswerScore((int)fk.getFleschKincaidScore());
+    }
+
 
     private static void findConnotationOfWords(Answers[] answer, ArrayList<String> listOfConnotingWords, int answerNum) {
         String answerLow = answer[answerNum].getCompleteAnswer().toLowerCase();
