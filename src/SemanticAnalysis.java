@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Scanner;
 
 public class SemanticAnalysis {
 
@@ -10,11 +11,27 @@ public class SemanticAnalysis {
     final static ArrayList<String> listOfNegativeConnotingWords = getWordList(negativeWordFile);
     final static ArrayList<String> listOfPositiveConnotingWords = getWordList(positiveWordsfile);
     final static ArrayList<String> listOfStopWords = getWordList(stopWords);
-    final static double multiplierForMinLength = 0.0; //change later
-    final static double multiplierForMaxLength = 0.0; //change later
+
+
+    final static int multiplierForMinLength = 0;
+    final static int multiplierForMaxLength = 0;
+
+    final static int underMinWordPenaltyScore = 0;
+    final static int overMaxWordPenaltyScore = 0;
+
+    final static int scoreAdditionIfResemblesQuestion = 0;
+    final static int djs = 0;
+
+
+
+
 
 
     public static void main(String[] args) {
+        Scanner keyboard = new Scanner(System.in);
+
+
+
         for (int i = 1; i < 6; i++) {
             String questionNum = "Question " + i;
             Document corpus = Document.findDocument("data\\" + questionNum + ".txt");
@@ -69,10 +86,10 @@ public class SemanticAnalysis {
     private static void scoringAccordingToLength(Answers answer, int meanOfAnswers) {//different if statments if you want to change how each size impacts score
 
         if (answer.getIndividualWords().size() < meanOfAnswers * multiplierForMinLength)
-            answer.addToAnswerScore(-1); //can Change Later
+            answer.addToAnswerScore(underMinWordPenaltyScore); //can Change Later
 
         if (answer.getIndividualWords().size() > meanOfAnswers * multiplierForMaxLength)
-            answer.addToAnswerScore(-2); //can Change Later
+            answer.addToAnswerScore(overMaxWordPenaltyScore); //can Change Later
 
 
     }
@@ -86,7 +103,7 @@ public class SemanticAnalysis {
     private static void checkForSharedWordsBetweenAnswerAndQuestion(Answers answer, ArrayList<String> individualQuestionWords) {
         for (String individualQuestionWord : individualQuestionWords) {
             if (answer.getCompleteAnswer().contains(individualQuestionWord))
-                answer.addToAnswerScore(10);  //can change number later (Is this a problem because maybe it doesnt change value of ansewr in array)
+                answer.addToAnswerScore(scoreAdditionIfResemblesQuestion);  //can change number later (Is this a problem because maybe it doesnt change value of ansewr in array)
         }
     }
 
