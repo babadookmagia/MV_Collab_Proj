@@ -1,4 +1,3 @@
-import javax.print.Doc;
 import java.util.ArrayList;
 
 public class SemanticAnalysis {
@@ -7,13 +6,21 @@ public class SemanticAnalysis {
             String questionNum = "Question " + i;
             Document corpus = Document.findDocument("C:\\Users\\kduval139\\IdeaProjects\\MV_Collab_Proj\\data\\" + questionNum + ".txt");
             String text = corpus.getText();
-            String answerTxt = text.substring(text.indexOf("Answer") + "answer".length()).trim();
+            String answerTxt = text.substring(text.indexOf("Answer") + "Answers".length()).trim();
             String question = findQuestion(text);
-            String[] answers = seperateAnswers(answerTxt);
-            String[] ordered = reorderAnswers(question, answers); //ordered[0] is the most useful answer
+            Answers[] answers = new Answers[seperateAnswers(answerTxt).length];
+            setIndividualAnswerText(answers, i, answerTxt);
+            String[] ordered = reorderAnswers(question, answers); //ordered[0] is the most useful Answers
         }
     }
 
+    private static void setIndividualAnswerText(Answers[] answers, int questionNum, String fullAnswerString) {
+        for (int i = 0; i < answers.length; i++) {
+            Answers answer = new Answers(seperateAnswers(fullAnswerString)[i]);
+            answer.setQuestionNum(questionNum);
+            answers[i]= answer;
+        }
+    }
     private static ArrayList<String> getWordList(String filename) {
         ArrayList<String> wordsList = (TextLib.sortDataPerValue(TextLib.readFileAsString(filename)));
         return wordsList;
@@ -50,11 +57,10 @@ public class SemanticAnalysis {
         return score;
     }
 
-    private static String[] reorderAnswers(String question, String[] answers) {
+    private static String[] reorderAnswers(String question, Answers[] answers) {
         String[] reorder = new String[answers.length];
-        int[] pScores = new int[answers.length]; //professionalism Scores
-        findAllScores(pScores, answers, question);
-        reorderBasedonScore(reorder, pScores, answers);
+        findAllScores(answers, question);
+        reorderBasedonScore(reorder, answers);
         return reorder;
     }
 
@@ -78,7 +84,7 @@ public class SemanticAnalysis {
         return maxIndex;
     }
 
-    private static void findAllScores(int[] pScores, String[] answers, String question) {
+    private static void findAllScores(String[] answers, String question) {
         for (int i = 0; i < answers.length; i++) {
             pScores[i] = scoreAnswer(answers, question);
         }

@@ -2,15 +2,17 @@ import javax.print.Doc;
 import javax.print.attribute.standard.DocumentName;
 import java.util.ArrayList;
 
-public class answer {
+public class Answers {
 
     String completeAnswer;
     ArrayList<String> individualWords;
     int score;
+    int questionNum;
 
-    public answer(String completeAnswer){
+    public Answers(String completeAnswer){
         this.completeAnswer = completeAnswer;
         breakUpAnswerIntoWords();
+        this.score = 1000;
     }
 
     public String getCompleteAnswer() {
@@ -39,5 +41,13 @@ public class answer {
 
     public void setCompleteAnswer(String completeAnswer) {
         this.completeAnswer = completeAnswer;
+    }
+
+    public void setQuestionNum(int questionNum){
+        this.questionNum = questionNum;
+    }
+
+    public int getQuestionNum() {
+        return questionNum;
     }
 }
