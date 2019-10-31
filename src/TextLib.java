@@ -1,10 +1,9 @@
-import javafx.concurrent.Worker;
-
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.text.BreakIterator;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Locale;
 import java.util.Scanner;
 
@@ -18,7 +17,7 @@ public class TextLib {
             scanner = new Scanner(new FileInputStream(filename), "UTF-8");
             while (scanner.hasNextLine()) {
                 String line = scanner.nextLine();
-                output.append(line.trim()+"\n");
+                output.append(line.trim() + "\n");
             }
 
             scanner.close();
@@ -39,16 +38,17 @@ public class TextLib {
 
         int prevIndex = 0;
         int boundaryIndex = breakIterator.first();
-        while(boundaryIndex != BreakIterator.DONE) {
+        while (boundaryIndex != BreakIterator.DONE) {
             String sentence = text.substring(prevIndex, boundaryIndex).trim();
-            if (sentence.length()>0)
+            if (sentence.length() > 0)
                 output.add(sentence);
             prevIndex = boundaryIndex;
             boundaryIndex = breakIterator.next();
         }
 
+
         String sentence = text.substring(prevIndex).trim();
-        if (sentence.length()>0)
+        if (sentence.length() > 0)
             output.add(sentence);
 
         return output;
@@ -86,15 +86,33 @@ public class TextLib {
         int count = 0;
 
         for (; start < line.length(); start++) {
-            if (line.substring(start, start+1).equals("*")) count++;
+            if (line.substring(start, start + 1).equals("*")) count++;
         }
 
-        return count+1;
+        return count + 1;
     }
 
     private static String getWordFromLine(String line) {
         return line.substring(0, line.indexOf("="));
     }
 
+    public static ArrayList<String> sortDataPerValue(String text) {
+        return parseDataIntoArrayList(text, "\n");
+    }
 
+
+    public static ArrayList<String> parseDataIntoArrayList(String text, String splitter) {
+        ArrayList<String> seperatedLines = new ArrayList<>(Arrays.asList(text.split(splitter)));
+        return seperatedLines;
+    }
+
+    public static void removeOccurances(ArrayList<String> individualWordsList, ArrayList<String> stopWords) {
+        for (int i = 0; i < individualWordsList.size(); i++) {
+            for (String stopWord : stopWords) {
+                if (individualWordsList.get(i).equals(stopWord)) {
+                    individualWordsList.remove(i);
+                }
+            }
+        }
+    }
 }

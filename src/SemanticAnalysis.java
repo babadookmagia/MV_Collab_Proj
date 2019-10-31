@@ -1,110 +1,102 @@
-import javax.print.Doc;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.Scanner;
 
 public class SemanticAnalysis {
     public static void main(String[] args) {
-        Document corpus = Document.findDocument("C:\\Users\\kyled\\IdeaProjects\\MV_Collab_Proj\\data\\Corpus (Testing) - Copy.txt");
-        String text = corpus.getText();
-        String question = findquestion(text);
-        System.out.println(question);;
-    }
-
-    private static String findquestion(String text) {
-        int startIndex = text.indexOf("Question") + 8;
-        int endIndex = text.indexOf("Answer");
-        return text.substring(startIndex, endIndex);
-    }
-
-    public int countOccurences(String text, String target) {
-        int count = 0;
-
-        for (int index = text.indexOf(target); index != -1; index = text.indexOf(target, index + 1)) {
-            ++count;
+        for (int i = 1; i < 6; i++) {
+            String questionNum = "Question " + i;
+            Document corpus = Document.findDocument("C:\\Users\\kduval139\\IdeaProjects\\MV_Collab_Proj\\data\\" + questionNum + ".txt");
+            String text = corpus.getText();
+            String answerTxt = text.substring(text.indexOf("Answer") + "Answers".length()).trim();
+            String question = findQuestion(text);
+            Answers[] answers = new Answers[seperateAnswers(answerTxt).length];
+            setIndividualAnswerText(answers, i, answerTxt);
+            String[] ordered = reorderAnswers(question, answers); //ordered[0] is the most useful Answers
         }
-
-        return count;
     }
 
-    public ArrayList<Integer> occuranceIndex(String text, String target) {
-        ArrayList<Integer> answer = new ArrayList();
-
-        for (int index = text.indexOf(target); index != -1; index = text.indexOf(target, index + 1)) {
-            answer.add(index);
+    private static void setIndividualAnswerText(Answers[] answers, int questionNum, String fullAnswerString) {
+        for (int i = 0; i < answers.length; i++) {
+            Answers answer = new Answers(seperateAnswers(fullAnswerString)[i]);
+            answer.setQuestionNum(questionNum);
+            answers[i]= answer;
         }
-
-        return answer;
+    }
+    private static ArrayList<String> getWordList(String filename) {
+        ArrayList<String> wordsList = (TextLib.sortDataPerValue(TextLib.readFileAsString(filename)));
+        return wordsList;
     }
 
-    public boolean coOccurWithinDist(String text, String target_1, String target_2, int distance) {
-        for (int i = 0; i < text.length() - distance; ++i) {
-            String checkArea = text.substring(i, i + distance + 1);
-            if (checkArea.contains(target_1) && checkArea.contains(target_2)) {
-                return true;
+    private static void printArrayList(ArrayList<String> negativeWords) {
+        for (String negativeWord : negativeWords) {
+            System.out.println(negativeWord);
+        }
+    }
+
+    private static int scoreAnswer(String[] answer, String question) {
+        int score = 1000;
+        //Find and compare relevancy
+        //Find and Compare Size
+        Document.stringToWords(answer);
+        score = score + findWords(answer, "C:\\Users\\kduval139\\IdeaProjects\\MV_Collab_Proj\\data\\particularPointerWords\\allExperienceOrExamples.csv");
+        score = score - findWords(answer, "C:\\Users\\kduval139\\IdeaProjects\\MV_Collab_Proj\\data\\particularPointerWords\\allSubtractiveWords.csv");
+        if (score > 0) {
+            return score;
+        }
+        return 0;
+    }
+
+    private static int findWords(String answer, String filename) {
+        int score = 0;
+        ArrayList<String> getNegativeWords = getWordList(filename);
+        String answerLow = answer.toLowerCase();
+        for (String word : getNegativeWords) {
+            if (answerLow.contains(word)) {
+                score++;
             }
         }
-
-        return false;
+        return score;
     }
 
-    private static boolean wordsContain(String input, String search) {
-        return (input.contains(search));
+    private static String[] reorderAnswers(String question, Answers[] answers) {
+        String[] reorder = new String[answers.length];
+        findAllScores(answers, question);
+        reorderBasedonScore(reorder, answers);
+        return reorder;
     }
 
-    private static ArrayList<String> getUniqueWords(ArrayList<String> words) {
-        ArrayList<String> uniqueWords = new ArrayList();
-        Iterator var2 = words.iterator();
-
-        while (var2.hasNext()) {
-            String word = (String) var2.next();
-            if (!uniqueWords.contains(word)) {
-                uniqueWords.add(word);
-            }
-        }
-
-        return uniqueWords;
-    }
-
-    private static ArrayList<String> inputToWords(String input) {
-        ArrayList<String> answer = new ArrayList<>();
-
-        input = input.toLowerCase();
-        input = removePunctuation(input);
-        String[] words = input.split(" ");
-        addtoarraylist(answer, words);
-
-        return answer;
-    }
-
-    private static void addtoarraylist(ArrayList<String> answer, String[] words) {
-        for (String word : words) {
-            if (!word.equals("")) {
-                answer.add(word);
-            }
+    private static void reorderBasedonScore(String[] reorder, int[] pScores, String[] answers) {
+        for (int i = 0; i < answers.length; i++) {
+            int maxIndex = findmaxindex(pScores);
+            reorder[i] = answers[maxIndex];
+            pScores[maxIndex] = 0;
         }
     }
 
-    private static String removePunctuation(String sentence) {
-        String answer = "";
-
-        for (int i = 0; i < sentence.length(); ++i) {
-            String letter = sentence.substring(i, i + 1);
-            if (isletter(letter)) {
-                answer = answer + letter;
-            } else {
-                answer = answer + " ";
+    private static int findmaxindex(int[] pScores) {
+        int max = pScores[0];
+        int maxIndex = 0;
+        for (int i = 1; i < pScores.length; i++) {
+            if (pScores[i] > max) {
+                max = pScores[i];
+                maxIndex = i;
             }
         }
-
-        return answer;
+        return maxIndex;
     }
 
-    private static boolean isletter(String letter) {
-        String characters = "1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
-        return characters.contains(letter);
+    private static void findAllScores(String[] answers, String question) {
+        for (int i = 0; i < answers.length; i++) {
+            pScores[i] = scoreAnswer(answers, question);
+        }
+    }
+
+    private static String[] seperateAnswers(String answerTxt) {
+        return answerTxt.split("Answer");
+    }
+
+    private static String findQuestion(String text) {
+        int startindex = text.indexOf("Question") + 8;
+        int endindex = text.indexOf("Answer");
+        return text.substring(startindex, endindex);
     }
 }

@@ -109,7 +109,7 @@ public class Document {
         return 0;
     }
 
-    private static ArrayList<String> getUniqueWords(ArrayList<String> words) {
+    public static ArrayList<String> getUniqueWords(ArrayList<String> words) {
         ArrayList<String> uniqueWords = new ArrayList();
         Iterator var2 = words.iterator();
 
@@ -123,7 +123,7 @@ public class Document {
         return uniqueWords;
     }
 
-    private static ArrayList<String> sentencesToWords(ArrayList<String> sentences) {
+    public static ArrayList<String> sentencesToWords(ArrayList<String> sentences) {
         ArrayList<String> answer = new ArrayList();
         Iterator var2 = sentences.iterator();
 
@@ -134,6 +134,16 @@ public class Document {
             String[] words = sentence.split(" ");
             addtoarraylist(answer, words);
         }
+
+        return answer;
+    }
+    public static ArrayList<String> stringToWords(String input) {
+        ArrayList<String> answer = new ArrayList();
+
+            input = input.toLowerCase();
+            input = removePunctuation(input);
+            String[] words = input.split(" ");
+            addtoarraylist(answer, words);
 
         return answer;
     }

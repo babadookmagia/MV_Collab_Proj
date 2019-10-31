@@ -1,0 +1,107 @@
+﻿Question
+
+
+What is the “-->” operator in C++?
+
+
+After reading Hidden Features and Dark Corners of C++/STL on comp.lang.c++.moderated, I was completely surprised that the following snippet compiled and worked in both Visual Studio 2008 and G++ 4.4.
+
+
+Here's the code:
+
+
+#include <stdio.h>
+int main()
+{
+    int x = 10;
+    while (x --> 0) // x goes to 0
+    {
+        printf("%d ", x);
+    }
+}
+I'd assume this is C, since it works in GCC as well. Where is this defined in the standard, and where has it come from?
+
+
+Answer
+
+
+--> is not an operator. It is in fact two separate operators, -- and >.
+
+
+The conditional's code decrements x, while returning x's original (not decremented) value, and then compares the original value with 0 using the > operator.
+
+
+To better understand, the statement could be written as follows:
+
+
+while( (x--) > 0 )
+
+
+Answer
+
+
+That's a very complicated operator, so even ISO/IEC JTC1 (Joint Technical Committee 1) placed its description in two different parts of the C++ Standard.
+
+
+Joking aside, they are two different operators: -- and > described respectively in §5.2.6/2 and §5.9 of the C++03 Standard.
+
+
+Answer
+
+
+It's equivalent to
+
+
+while (x-- > 0)
+x-- (post decrement) is equivalent to x = x-1 so, the code transforms to:
+
+
+while(x > 0) {
+    x = x-1;
+    // logic
+}
+
+
+Answer
+
+
+In the conventional way we would define a condition in the while loop parenthesis () and a terminating condition inside the braces {}, but --> defines both at once.
+
+
+For example:
+
+
+int abc(void)
+{
+    int a = 5
+    while((a--) > 0) // Decrement and comparison both at once
+    {
+        // Code
+    }
+}
+This decrements a and runs the loop while a is greater than 0.
+
+
+Conventionally, it would be like:
+
+
+int abc(void)
+{
+    int a = 5;
+    while(a > 0)
+    {
+        a--;
+        // Code
+    }
+    a--;
+}
+Both ways, we do the same thing and achieve the same goals.
+
+
+Answer
+
+
+-- is the decrement operator and > is the greater-than operator.
+
+
+The two operators are applied as a single one like -->.
