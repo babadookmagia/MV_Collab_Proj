@@ -9,7 +9,7 @@ public class SemanticAnalysis {
             String answerTxt = text.substring(text.indexOf("Answer") + "Answers".length()).trim();
             String question = findQuestion(text);
             Answers[] answers = setIndividualAnswerText(i, answerTxt);
-            reorderAnswers(question, answers); //ordered[0] is the most useful Answers
+            answers = reorderAnswers(question, answers); //ordered[0] is the most useful Answers
         }
     }
 
@@ -44,7 +44,7 @@ public class SemanticAnalysis {
             return score;
         }
         return 0;
-    }
+    } //keep in mind it is void so just set each thing in the answer list
 
     private static int findWords(String answer, String filename) { //Seaches for certain amounts of a word in an answer from corpus (filename)
         int score = 0;
@@ -59,7 +59,7 @@ public class SemanticAnalysis {
     }
 
     private static Answers[] reorderAnswers(String question, Answers[] answers) { //gets scores and reorders the Answers
-        scoreAnswer(answers[],question);
+        scoreAnswer(answers,question);
         return reorderBasedonScore(answers);
     }
 
