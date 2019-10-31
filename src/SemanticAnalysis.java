@@ -27,24 +27,33 @@ public class SemanticAnalysis {
     private static int scoreAdditionForInclusionOfpositiveWords = 0;
 
 
-
-
-
-
     public static void main(String[] args) {
         Scanner keyboard = new Scanner(System.in);
 
-      //  promptUserInput(keyboard);
+        //  promptUserInput(keyboard);
 
+        double successCount = 0;
+        int total = 0;
         for (int i = 1; i < 6; i++) {
             String questionNum = "Question " + i;
             Document corpus = Document.findDocument("data\\forumQuestions\\" + questionNum + ".txt");
             String text = corpus.getText();
             String answerTxt = text.substring(text.indexOf("Answer") + "Answers".length()).trim();
             String question = findQuestion(text);
-            Answers[] answers = setIndividualAnswerText(i, answerTxt);
-            answers = reorderAnswers(question, answers); //ordered[0] is the most useful Answers
+            Answers[] unOrderedanswers = setIndividualAnswerText(i, answerTxt);
+            Answers[] answers = reorderAnswers(question, unOrderedanswers); //ordered[0] is the most useful Answers
+            double error = checkError(unOrderedanswers, answers, successCount, total);
         }
+    }
+
+    private static double checkError(Answers[] unOrderedanswers, Answers[] answers, double success, int total) {
+        for (int i = 0; i < answers.length; i++) {
+            total++;
+            if (answers[i].getCompleteAnswer().equals(unOrderedanswers[i].getCompleteAnswer())) {
+                success++;
+            }
+        }
+        return success/total;
     }
 
     private static void promptUserInput(Scanner keyboard) {
@@ -74,7 +83,7 @@ public class SemanticAnalysis {
 
             System.out.println("In order to add points for according to the complexity of the answer a multiplier must be determined to control the impact of this criteria on the overall score. How much would you like to multiply the readability of the answer by to determine the impact?");
             multiplierForMaxLength = keyboard.nextInt();
-        }while (multiplierForMaxLength <= 0 || multiplierForMinLength <= 0 ||overMaxWordPenaltyScore <= 0 ||underMinWordPenaltyScore <= 0 ||scoreAdditionIfResemblesQuestion <= 0 ||scoreAdditionForInclusionOfpositiveWords <= 0 || scorePenaltyForInclusionOfNegativeWords <= 0 );
+        } while (multiplierForMaxLength <= 0 || multiplierForMinLength <= 0 || overMaxWordPenaltyScore <= 0 || underMinWordPenaltyScore <= 0 || scoreAdditionIfResemblesQuestion <= 0 || scoreAdditionForInclusionOfpositiveWords <= 0 || scorePenaltyForInclusionOfNegativeWords <= 0);
     }
 
     private static Answers[] setIndividualAnswerText(int questionNum, String fullAnswerString) {
@@ -106,13 +115,14 @@ public class SemanticAnalysis {
             fkReadability(answer[answerNum]);
             findConnotationOfWords(answer, listOfNegativeConnotingWords, answerNum);
             findConnotationOfWords(answer, listOfPositiveConnotingWords, answerNum);
+            System.out.println(answer[answerNum].getScore());
         }
 
     } //keep in mind it is void so just set each thing in the answer list
 
     private static void fkReadability(Answers answers) {
         Document fk = new Document(answers.getCompleteAnswer());
-        answers.addToAnswerScore((int)fk.getFleschKincaidScore()*multiplierForReadabilityScore);
+        answers.addToAnswerScore((int) fk.getFleschKincaidScore() * multiplierForReadabilityScore);
     }
 
     private static void findConnotationOfWords(Answers[] answer, ArrayList<String> listOfConnotingWords, int answerNum) {
@@ -122,7 +132,7 @@ public class SemanticAnalysis {
                 if (listOfNegativeConnotingWords.contains(listOfConnotingWords))
                     answer[answerNum].addToAnswerScore(-scorePenaltyForInclusionOfNegativeWords);
                 else
-                answer[answerNum].addToAnswerScore(scoreAdditionForInclusionOfpositiveWords);
+                    answer[answerNum].addToAnswerScore(scoreAdditionForInclusionOfpositiveWords);
             }
         }
     }
