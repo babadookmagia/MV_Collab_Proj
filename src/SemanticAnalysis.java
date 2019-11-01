@@ -1,4 +1,3 @@
-import javax.print.Doc;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -26,11 +25,15 @@ public class SemanticAnalysis {
     private static int scorePenaltyForInclusionOfNegativeWords = 0;
     private static int scoreAdditionForInclusionOfpositiveWords = 0;
 
+    private static double errorCheck = 0;
+    private static double errorTotal = 0;
+
+
 
     public static void main(String[] args) {
         Scanner keyboard = new Scanner(System.in);
 
-        //  promptUserInput(keyboard);
+         promptUserInput(keyboard);
 
         double successCount = 0;
         int total = 0;
@@ -43,10 +46,15 @@ public class SemanticAnalysis {
             Answers[] unOrderedanswers = setIndividualAnswerText(i, answerTxt);
             Answers[] answers = reorderAnswers(question, unOrderedanswers); //ordered[0] is the most useful Answers
             double error = checkError(unOrderedanswers, answers, successCount, total);
+            System.out.println(error);
+            errorTotal++;
+            errorCheck += error;
         }
+     System.out.println(errorCheck*100/errorTotal);
+
     }
 
-    private static double checkError(Answers[] unOrderedanswers, Answers[] answers, double success, int total) {
+    private static double checkError(Answers[] unOrderedanswers, Answers[] answers, double success, double total) {
         for (int i = 0; i < answers.length; i++) {
             total++;
             if (answers[i].getCompleteAnswer().equals(unOrderedanswers[i].getCompleteAnswer())) {
@@ -58,7 +66,7 @@ public class SemanticAnalysis {
 
     private static void promptUserInput(Scanner keyboard) {
 
-        do {
+
             System.out.println("(Input a 'Yes' or 'no')Would you like to decide a value for every specific criteria or set a constant score for every one? (This means every criteria has the same impact on the score).");
             String specificInput = keyboard.next();
             if (specificInput.equalsIgnoreCase("yes"))
@@ -89,17 +97,17 @@ public class SemanticAnalysis {
                     System.out.println("In order to add points for according to the complexity of the answer a multiplier must be determined to control the impact of this criteria on the overall score. How much would you like to multiply the readability of the answer by to determine the impact?");
                     multiplierForMaxLength = keyboard.nextInt();
                 }
-                while (multiplierForMaxLength <= 0 || multiplierForMinLength <= 0 || overMaxWordPenaltyScore <= 0 || underMinWordPenaltyScore <= 0 || scoreAdditionIfResemblesQuestion <= 0 || scoreAdditionForInclusionOfpositiveWords <= 0 || scorePenaltyForInclusionOfNegativeWords <= 0);
+                while (multiplierForMaxLength <= 0 || multiplierForMinLength <= 0 || multiplierForReadabilityScore <= 0 || overMaxWordPenaltyScore <= 0 || underMinWordPenaltyScore <= 0 || scoreAdditionIfResemblesQuestion <= 0 || scoreAdditionForInclusionOfpositiveWords <= 0 || scorePenaltyForInclusionOfNegativeWords <= 0);
             if (specificInput.equalsIgnoreCase("no")) {
                 multiplierForMinLength = 4;
                 multiplierForMaxLength = 4;
                 multiplierForReadabilityScore = 1;
+                overMaxWordPenaltyScore = 1;
                 underMinWordPenaltyScore = 1;
                 scoreAdditionIfResemblesQuestion = 1;
                 scoreAdditionForInclusionOfpositiveWords = 1;
                 scorePenaltyForInclusionOfNegativeWords = 1;
             }
-        }while(!specificInput.equalsIgnoreCase("yes") && !specificInput.equalsIgnoreCase("no")  );
     }
 
 
@@ -128,30 +136,46 @@ public class SemanticAnalysis {
         int meanOfAnswers = findMeanLengthOfAnswer(answer);
         for (int answerNum = 0; answerNum < answer.length; answerNum++) {
             scoringAccordingToLength(answer[answerNum], meanOfAnswers);
-            compareAnswersToQuestion(answer, answerNum, question);
             fkReadability(answer[answerNum]);
-            findConnotationOfWords(answer, listOfNegativeConnotingWords, answerNum);
-            findConnotationOfWords(answer, listOfPositiveConnotingWords, answerNum);
-            System.out.println(answer[answerNum].getScore());
+            findNegativeConnotationOfWords(answer, listOfNegativeConnotingWords, answerNum);
+            findPositiveConnotationOfWords(answer, listOfPositiveConnotingWords, answerNum);
+            compareAnswersToQuestion(answer, answerNum, question);
+
         }
 
     } //keep in mind it is void so just set each thing in the answer list
 
     private static void fkReadability(Answers answers) {
+      //  System.out.println(answers.getScore() + " b");
+
         Document fk = new Document(answers.getCompleteAnswer());
         answers.addToAnswerScore((int) fk.getFleschKincaidScore() * multiplierForReadabilityScore);
+
+     //   System.out.println(answers.getScore() + " a");
     }
 
-    private static void findConnotationOfWords(Answers[] answer, ArrayList<String> listOfConnotingWords, int answerNum) {
-        String answerLow = answer[answerNum].getCompleteAnswer().toLowerCase();
-        for (String word : listOfPositiveConnotingWords) {
-            if (answerLow.contains(word)) {
-                if (listOfNegativeConnotingWords.contains(listOfConnotingWords))
+    private static void findNegativeConnotationOfWords(Answers[] answer, ArrayList<String> listOfConnotingWords, int answerNum) {
+      // System.out.println(answer[answerNum].getScore() + " b");
+
+        for (String listOfNegativeConnotingWord : listOfNegativeConnotingWords) {
+            for (int j = 0; j < answer[answerNum].getIndividualWords().size(); j++) {
+                if (answer[answerNum].getIndividualWords().get(j).toLowerCase().contains(listOfNegativeConnotingWord))
                     answer[answerNum].addToAnswerScore(-scorePenaltyForInclusionOfNegativeWords);
-                else
+            }
+        }
+       //System.out.println(answer[answerNum].getScore() + " a");
+    }
+
+    private static void findPositiveConnotationOfWords(Answers[] answer, ArrayList<String> listOfConnotingWords, int answerNum) {
+        // System.out.println(answer[answerNum].getScore() + " b");
+
+        for (String listOfPositiveConnotingWord : listOfPositiveConnotingWords) {
+            for (int j = 0; j < answer[answerNum].getIndividualWords().size(); j++) {
+                if (answer[answerNum].getIndividualWords().get(j).toLowerCase().contains(listOfPositiveConnotingWord))
                     answer[answerNum].addToAnswerScore(scoreAdditionForInclusionOfpositiveWords);
             }
         }
+        //System.out.println(answer[answerNum].getScore() + " a");
     }
 
     private static int findMeanLengthOfAnswer(Answers[] answer) {
@@ -163,20 +187,30 @@ public class SemanticAnalysis {
     }
 
     private static void scoringAccordingToLength(Answers answer, int meanOfAnswers) {//different if statments if you want to change how each size impacts score
+      //  System.out.println(answer.getScore() + "b");
 
-        if (answer.getIndividualWords().size() < meanOfAnswers * multiplierForMinLength)
-            answer.addToAnswerScore(underMinWordPenaltyScore); //can Change Later
+        if (answer.getIndividualWords().size() < meanOfAnswers * multiplierForMinLength) {
+            answer.addToAnswerScore(-underMinWordPenaltyScore); //can Change Later
+           // System.out.println("hey");
+        }
 
-        if (answer.getIndividualWords().size() > meanOfAnswers * multiplierForMaxLength)
-            answer.addToAnswerScore(overMaxWordPenaltyScore); //can Change Later
+        if (answer.getIndividualWords().size() > meanOfAnswers * multiplierForMaxLength) {
+           // System.out.println("hey");
+            answer.addToAnswerScore(-overMaxWordPenaltyScore); //can Change Later
+        }
 
+      //  System.out.println(answer.getScore() + "a");
 
     }
 
     private static void compareAnswersToQuestion(Answers[] answer, int answerNum, String question) {
+       // System.out.println(answer[answerNum].getScore() + "b");
+
         answer[answerNum].setIndividualWords(removeStopWords(answer[answerNum].getIndividualWords())); //removes the stop words and replaces the old list of words (Instead of this we could do this from inside the answers object?)
         ArrayList<String> individualQuestionWords = Document.stringToWords(question);
         checkForSharedWordsBetweenAnswerAndQuestion(answer[answerNum], individualQuestionWords);
+
+      //  System.out.println(answer[answerNum].getScore() + "a");
     }
 
     private static void checkForSharedWordsBetweenAnswerAndQuestion(Answers answer, ArrayList<String> individualQuestionWords) {
